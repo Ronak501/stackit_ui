@@ -7,7 +7,7 @@ import bcrypt from "bcryptjs";
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
-      name: "Credentials",
+      name: "credentials",
       credentials: {
         email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
@@ -17,11 +17,14 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Missing email or password");
         }
 
+        console.log("Credentials received:", credentials);
+
         try {
           await connectToDatabase();
           const user = await User.findOne({ email: credentials.email });
 
           if (!user) {
+            console.error("No user found with this email:", credentials.email);
             throw new Error("No user found");
           }
 
@@ -31,9 +34,11 @@ export const authOptions: NextAuthOptions = {
           );
 
           if (!isValid) {
+            console.error("Invalid password for user:", credentials.password);
             throw new Error("Invalid password");
           }
 
+          console.log("User authenticated successfully:", user.email);
           return {
             id: user._id.toString(),
             email: user.email,
@@ -60,8 +65,8 @@ export const authOptions: NextAuthOptions = {
     },
   },
   pages: {
-    signIn: "/login",
-    error: "/login",
+    signIn: "/",
+    error: "/signup",
   },
   session: {
     strategy: "jwt",

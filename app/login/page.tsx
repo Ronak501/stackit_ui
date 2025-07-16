@@ -37,11 +37,11 @@ export default function AuthPage() {
         e.currentTarget.elements.namedItem("login-password") as HTMLInputElement
         ).value;
 
-        const result = await signIn("Credentials", {
+        const result = await signIn("credentials", {
             email,
             password,
-            redirect: true,
-            callbackUrl: "/",
+            redirect: false, // Prevent automatic redirect
+            callbackUrl: "/", 
         });
 
         console.log("SignIn result", result);
@@ -50,13 +50,11 @@ export default function AuthPage() {
           console.log("Login error:", result.error);
         } else if (result?.ok && result.url) {
           router.push(result.url); // Redirects after successful login
-          console.log("Login successful");
+          console.log("Login successful", result);
         }
-
 
         // Simulate API call
         // await new Promise((resolve) => setTimeout(resolve, 1000));
-
         setIsLoading(false);
     };
 
