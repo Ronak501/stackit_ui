@@ -51,6 +51,7 @@ const questionData = {
     },
   ],
 }
+
 export default function QuestionDetailPage({ params }: { params: { id: string } }) {
   // In a real app, you'd fetch questionData based on params.id
   const question = questionData // Using placeholder for now

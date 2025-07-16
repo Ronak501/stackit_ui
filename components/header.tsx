@@ -7,6 +7,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Bell, Search, Menu, User, LogIn } from "lucide-react"
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet"
 
+const handleLogout = () => {
+  // Remove auth token or any stored user data
+  localStorage.removeItem('token'); // or sessionStorage
+  // Optional: remove other user info
+  localStorage.clear();
+
+  // Redirect to login or homepage
+  window.location.href = '/login'; // or use Next/router if needed
+}
+
 export default function Header() {
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-sm">
@@ -50,7 +60,7 @@ export default function Header() {
             <DropdownMenuContent align="end">
               <DropdownMenuItem>Profile</DropdownMenuItem>
               <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem>Logout</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           <Sheet>
