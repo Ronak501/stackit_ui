@@ -2,8 +2,8 @@
 
 import { Input } from "@/components/ui/input"
 import { Search } from "@/components/ui/search"
-
-import { useState } from "react"
+import type { IQuestion as Question } from "@/models/Question"
+import { useEffect, useState } from "react"
 import Header from "@/components/header"
 import QuestionCard from "@/components/question-card"
 import PaginationControls from "@/components/pagination-controls"
@@ -12,68 +12,26 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import { Plus, ChevronDown } from "lucide-react"
 import Link from "next/link"
 
-// Placeholder data
-const questions = [
-  {
-    id: "1",
-    title: "How to join 2 columns in a data set to make a separate column in SQL",
-    description:
-      "I do not know the code for it as I am a beginner. As an example what I need to do is like there is a column 1 containing First Name, and column 2 consists of last name I want to combine them to make a new column called Full Name.",
-    tags: ["SQL", "Database", "Beginner"],
-    userName: "User Name",
-    answerCount: 3,
-    upvotes: 15,
-    downvotes: 2,
-  },
-  {
-    id: "2",
-    title: "Understanding React Hooks: useState vs. useReducer",
-    description:
-      "I'm new to React and trying to understand the best practices for state management. When should I use useState and when is useReducer a better choice? Are there specific scenarios where one is clearly superior?",
-    tags: ["React", "Hooks", "Frontend"],
-    userName: "ReactLearner",
-    answerCount: 5,
-    upvotes: 25,
-    downvotes: 1,
-  },
-  {
-    id: "3",
-    title: "Best practices for securing a Node.js API",
-    description:
-      "I'm building a RESTful API with Node.js and Express. What are the essential security measures I should implement to protect against common vulnerabilities like XSS, CSRF, and SQL injection?",
-    tags: ["Node.js", "Security", "API"],
-    userName: "SecureDev",
-    answerCount: 8,
-    upvotes: 40,
-    downvotes: 3,
-  },
-  {
-    id: "4",
-    title: "How to implement server-side rendering (SSR) with Next.js 14?",
-    description:
-      "I'm working on a Next.js 14 project and need to implement SSR for better SEO and initial page load performance. What's the recommended approach with the App Router, and how do I fetch data on the server?",
-    tags: ["Next.js", "SSR", "React"],
-    userName: "NextGenDev",
-    answerCount: 2,
-    upvotes: 10,
-    downvotes: 0,
-  },
-  {
-    id: "5",
-    title: "Optimizing database queries in PostgreSQL for large datasets",
-    description:
-      "My PostgreSQL database is growing, and some queries are becoming slow. What strategies can I use to optimize query performance for large datasets? Indexing, query planning, or other techniques?",
-    tags: ["PostgreSQL", "Database", "Optimization"],
-    userName: "DataWizard",
-    answerCount: 6,
-    upvotes: 30,
-    downvotes: 0,
-  },
-]
-
 export default function HomePage() {
   const [currentPage, setCurrentPage] = useState(1)
+  const [questions, setQuestions] = useState<Question[]>([])
   const totalPages = 5 // Example total pages
+
+  useEffect(() => {
+    // Fetch questions from the API when the component mounts
+    const fetchQuestions = async () => {
+      try {
+        const response = await fetch("/api/question");
+        if (!response.ok) throw new Error("Failed to fetch questions");
+        const data = await response.json();
+        setQuestions(data.questions);
+      } catch (error) {
+        console.error("Error fetching questions:", error);
+      }
+    };
+
+    fetchQuestions();
+  }, []);
 
   const handlePageChange = (page: number) => setCurrentPage(page)
   // In a real app, you'd fetch data for the new page here
@@ -129,7 +87,17 @@ export default function HomePage() {
 
           <div className="grid gap-6">
             {questions.map((question) => (
-              <QuestionCard key={question.id} {...question} />
+              <QuestionCard 
+                key={question._id?.toString()}
+                id={question._id?.toString() || ''}
+                title={question.title}
+                description={question.description}
+                tags={question.tags}
+                userName="Anonymous" // Add proper user name when available
+                answerCount={0} // Add proper answer count when available
+                upvotes={0} // Add proper upvotes when available
+                downvotes={0} // Add proper downvotes when available
+              />
             ))}
           </div>
 

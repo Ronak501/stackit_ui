@@ -10,20 +10,61 @@ import { Label } from "@/components/ui/label"
 import RichTextEditor from "@/components/rich-text-editor"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { toast } from "@/hooks/use-toast" // Assuming use-toast is available
+import { useRouter } from "next/navigation"
 
 export default function AskQuestionPage() {
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [tags, setTags] = useState("")
+  const router = useRouter()
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log(title, description, tags)
-    // In a real application, you would send this data to your backend
-    toast({
-      title: "Question Submitted!",
-      description: "Your question has been successfully posted.",
-    })
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!title || !description) {
+      toast({
+        title: "Error",
+        description: "Title and description are required.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    console.log("Submitting question with title:", title, "description:", description, "tags:", tags);
+
+    try {
+      const res = await fetch("/api/ask", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title,
+          description,
+          tags: tags.split(",").map(tag => tag.trim()), // Split tags by comma and trim whitespace
+        }),
+      });
+                
+      const data = await res.json();
+    
+      if (!res.ok) {
+        throw new Error(data.error || "Registration failed");
+      }
+    
+      router.push("/");
+      toast({
+        title: "Question Submitted!",
+        description: "Your question has been successfully posted.",
+      });
+    } catch (error) {
+        console.error("Submit error: ", error);
+        toast({
+          title: "Submission Failed",
+          description: "Submission failed. Please try again.",
+          variant: "destructive",
+        });
+    }
+  
     setTitle("")
     setDescription("")
     setTags("")

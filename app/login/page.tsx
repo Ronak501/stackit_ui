@@ -19,6 +19,8 @@ import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 //Manually import
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { toast } from "@/hooks/use-toast" // Assuming use-toast is available
+
 
 export default function AuthPage() {
     const [showPassword, setShowPassword] = useState(false);
@@ -44,13 +46,22 @@ export default function AuthPage() {
             callbackUrl: "/", 
         });
 
-        console.log("SignIn result", result);
+        // console.log("SignIn result", result);
 
         if (result?.error) {
           console.log("Login error:", result.error);
+          toast({
+            title: "Login Failed",
+            description: result.error,
+            variant: "destructive",
+          });
         } else if (result?.ok && result.url) {
           router.push(result.url); // Redirects after successful login
-          console.log("Login successful", result);
+            //   console.log("Login successful", result);
+            toast({
+              title: "Login Successful",
+              description: "You have successfully logged in.",
+            });
         }
 
         // Simulate API call
@@ -99,9 +110,18 @@ export default function AuthPage() {
 
           console.log(data);
             router.push("/login");
-            console.log("Signup submitted");
+            toast({
+              title: "Registration Successful",
+              description: "You can now log in with your new account.",
+            });
+            // console.log("Signup submitted");
         } catch (error) {
             console.error("Signup error: ", error);
+            toast({
+              title: "Registration Failed",
+              description: "Registration failed. Please try again.",
+              variant: "destructive",
+            });
         }
         // Simulate API call
         // await new Promise((resolve) => setTimeout(resolve, 1000));
